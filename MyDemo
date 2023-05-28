@@ -1,0 +1,70 @@
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MyDemo {
+
+    public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
+
+        SecureRandom rnd = SecureRandom.getInstanceStrong();
+
+        int totalTest = 10000;
+        int doorCount = 3;
+
+        int notChangeSucc = 0;
+        int changeSucc = 0;
+
+        for (int i = 0; i < totalTest; i++) {
+
+
+            //先初始化3个门
+            boolean[] arr = new boolean[doorCount];
+            //随机选取一个编号作为跑车所在的门编号
+            int carIndex = rnd.nextInt(doorCount);
+            //将那扇门设置为跑车
+            arr[carIndex] = true;
+
+            //现在我随便抽一个门
+            int myChoose = rnd.nextInt(doorCount);
+
+            //抽完后主持人会从羊的门中排除掉任意一个,需要记录被排除掉后主持人留下的那个门编号
+            int zhuChiLeave = -1;
+
+            //主持人排除的方法如下
+            //如果主持人发现我选得是跑车,则从我选剩的 2 扇门中排除掉任意一扇门
+            if (carIndex == myChoose) {
+                //找到我选剩下的门
+                List<Integer> myLeave = new ArrayList<>();
+                for (int j = 0; j < doorCount; j++) {
+                    if (!arr[j]) {
+                        myLeave.add(j);
+                    }
+                }
+                //从中只能随机留下 1 扇门
+                int leave = rnd.nextInt(myLeave.size());
+
+                //得到留下的门编号
+                zhuChiLeave = myLeave.get(leave);
+            } else {
+                //如果主持人发现我选的是羊,则主持人只能排除羊所在的门,留下跑车的门
+                zhuChiLeave = carIndex;
+            }
+            //统计我不换门时的中奖次数
+            if (myChoose == carIndex) {
+                notChangeSucc++;
+            }
+
+            //统计我换门时的中奖次数
+            myChoose = zhuChiLeave;
+
+            //最终统计我选的是跑车的次数
+            if (myChoose == carIndex) {
+                changeSucc++;
+            }
+        }
+
+        System.out.println("门总数为" + doorCount + "," + totalTest + "次实验中,不换门中奖" + notChangeSucc + "次,换门中奖" + changeSucc + "次");
+    }
+
+}
